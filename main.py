@@ -298,7 +298,8 @@ with tab2:
             lambda x: label_over if x >= threshold else label_under
         )
 
-        fig_map = px.choropleth_mapbox(
+        # Plotly 표준 px.choropleth 사용 (버전 간 호환성 확보)
+        fig_map = px.choropleth(
             sigungu_map_df,
             geojson=geojson_sigungu,
             locations="sigungu_code",
@@ -309,9 +310,6 @@ with tab2:
                 label_under: "#D3D3D3"
             },
             category_orders={"구분": [label_over, label_under]},
-            mapbox_style="white-bg",
-            center={"lat": 35.8, "lon": 127.8},
-            zoom=6.0,
             hover_name="시군구풀네임",
             hover_data={
                 "sigungu_code": False,
@@ -326,6 +324,12 @@ with tab2:
                 "고령인구_계": "65세 이상 인구",
                 "구분": "고령화율 범주"
             }
+        )
+
+        # 대한민국 중심에 맞게 지도 투영 영역 고정
+        fig_map.update_geos(
+            fitbounds="locations",
+            visible=False
         )
 
         fig_map.update_layout(
@@ -396,8 +400,8 @@ with tab3:
 
     st.markdown("---")
 
-    # 3) 울산 지도 (Plotly Choropleth Mapbox)
-    fig_ulsan = px.choropleth_mapbox(
+    # 3) Plotly 표준 px.choropleth 사용
+    fig_ulsan = px.choropleth(
         ulsan_df,
         geojson=geojson_ulsan,
         locations="adm_cd2",              # 10자리 코드
@@ -405,9 +409,6 @@ with tab3:
         color="고령화율",
         color_continuous_scale="YlOrRd",   # 고령화율이 높을수록 진한 색상
         range_color=(10, 35),
-        mapbox_style="white-bg",
-        center={"lat": 35.5384, "lon": 129.3114}, # 울산 중심 좌표
-        zoom=9.5,
         hover_name="adm_nm",              # 마우스 올렸을 때 행정동 풀네임 표시
         hover_data={
             "adm_cd2": False,
@@ -420,6 +421,12 @@ with tab3:
             "전체인구_계": "전체 인구",
             "고령인구_계": "65세 이상 인구"
         }
+    )
+
+    # 울산 영역으로 영역 자동 맞춤
+    fig_ulsan.update_geos(
+        fitbounds="locations",
+        visible=False
     )
 
     fig_ulsan.update_layout(
