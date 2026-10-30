@@ -58,7 +58,7 @@ st.title("📊 대한민국 인구 분포 및 고령화 지도 종합 분석")
 st.write("원하시는 분석 메뉴를 선택하여 읍·면·동 단위 심층 분석, 전국 고령화 단계구분도, 울산 행정동 지도 분석을 하나의 화면에서 확인해보세요.")
 
 # -----------------------------------------------------------------------------
-# 2. 데이터 및 GeoJSON 캐싱 로딩
+# 2. 데이터 및 GeoJSON 캐싱 로딩 (오류 부분 정상 수정)
 # -----------------------------------------------------------------------------
 @st.cache_data
 def load_data():
@@ -69,7 +69,7 @@ def load_data():
     max_year = df['연도'].max()
     df_latest = df[df['연도'] == max_year].copy()
     
-    # 컬럼 분류
+    # 컬럼 분류 (계_, 남_, 여_)
     total_cols = [c for c in df_latest.columns if c.startswith('계_')]
     male_cols = [c for c in df_latest.columns if c.startswith('남_')]
     female_cols = [c for c in df_latest.columns if c.startswith('여_')]
@@ -97,11 +97,11 @@ def load_data():
     
     df_latest['동네명_풀'] = df_latest['시도'] + " " + df_latest['시군구'] + " " + df_latest['동']
     
-    # 행정동 코드(10자리 문자열) 정형화
+    # 행정동 코드(10자리 문자열) 정형화 및 시군구 5자리 코드 추출
     df_latest['코드_str'] = df_latest['코드'].astype(str).str.zfill(10)
     df_latest['sigungu_code'] = df_latest['코드_str'].str[:5]
     
-    # 시군구 단위 합산 데이터
+    # 시군구 단위 합산 데이터 생성
     sigungu_df = df_latest.groupby('sigungu_code', as_index=False).agg({
         '시도': 'first',
         '시군구': 'first',
